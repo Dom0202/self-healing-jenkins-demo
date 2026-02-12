@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.11'
+            args '-u root:root'
+        }
+    }
 
     environment {
         VENV = "venv"
@@ -15,7 +20,7 @@ pipeline {
 
         stage('Setup Python') {
             steps {
-                sh 'python3 -m venv $VENV'
+                sh 'python -m venv $VENV'
                 sh '. $VENV/bin/activate && pip install --upgrade pip'
                 sh '. $VENV/bin/activate && pip install -r requirements.txt'
             }
@@ -30,7 +35,7 @@ pipeline {
 
     post {
         failure {
-            echo "Build failed. Future: Send logs to self-healing system."
+            echo "Build failed."
         }
         success {
             echo "Build succeeded."
